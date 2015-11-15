@@ -1,6 +1,6 @@
 prebuilt_native_library(
   name = 'tfs_sdk_native_libs',
-  native_libs = 'libs/native',
+  native_libs = 'lib/native',
 )
 
 prebuilt_jar(
