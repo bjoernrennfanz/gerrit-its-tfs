@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
+import com.microsoft.tfs.core.clients.webservices.TeamFoundationIdentity;
 import com.microsoft.tfs.core.clients.workitem.CoreFieldReferenceNames;
 import com.microsoft.tfs.core.clients.workitem.WorkItem;
 import com.microsoft.tfs.core.clients.workitem.WorkItemClient;
@@ -94,11 +95,11 @@ public class TfsItsFacade implements ItsFacade
       {
         if (check.equals(Check.ACCESS))
         {
-          return ""; //healthCheckAccess();
+          return healthCheckAccess();
         }
         else
         {
-          return ""; //healthCheckSysinfo();
+          return healthCheckSysinfo();
         }
       }
     });
@@ -250,5 +251,21 @@ public class TfsItsFacade implements ItsFacade
   {
     String issueIdDigits = issueId.replaceAll("\\D+", "");
     return Integer.parseInt(issueIdDigits);
+  }
+
+  private String healthCheckAccess() throws TECoreException
+  {
+    TeamFoundationIdentity teamFoundationIdentity = teamProjectCollection.getAuthenticatedIdentity();
+    final String result = "{\"status\"=\"ok\",\"username\"=\""+teamFoundationIdentity.getUniqueName()+"\"}";
+    log.debug("Healtheck on access result: {}", result);
+    return result;
+  }
+
+  private String healthCheckSysinfo() throws TECoreException, IOException
+  {
+    final String version = teamProjectCollection.getWorkItemClient().getVersion().toString();
+    final String result = "{\"status\"=\"ok\",\"system\"=\"TFS\",\"version\"=\""+version+"\",\"url\"=\""+getUrl()+"\"}";
+    log.debug("Healtheck on sysinfo result: {}", result);
+    return result;
   }
 }
